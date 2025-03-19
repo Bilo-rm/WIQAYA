@@ -60,12 +60,12 @@ const SHADOWS = {
 
 // Health-Related Amenity Types
 const HEALTH_AMENITY_TYPES = [
-  { label: 'Hospitals', value: 'hospital' },
-  { label: 'Pharmacies', value: 'pharmacy' },
-  { label: 'Clinics', value: 'clinic' },
-  { label: 'Doctors', value: 'doctors' },
-  { label: 'Dentists', value: 'dentist' },
-  { label: 'Opticians', value: 'optician' },
+  { label: 'المستشفيات', value: 'hospital' },
+  { label: 'الصيدليات', value: 'pharmacy' },
+  { label: 'العيادات', value: 'clinic' },
+  { label: 'الأطباء', value: 'doctors' },
+  { label: 'أطباء الأسنان', value: 'dentist' },
+  { label: 'أطباء العيون', value: 'optician' },
 ];
 
 // Custom Hook for Location and Amenities
@@ -80,7 +80,7 @@ const useLocationAndAmenities = (amenityType) => {
       const fetchData = async () => {
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
-          setErrorMsg('Permission to access location was denied');
+          setErrorMsg('تم رفض الإذن للوصول إلى الموقع');
           setLoading(false);
           return;
         }
@@ -112,10 +112,10 @@ const useLocationAndAmenities = (amenityType) => {
         const validAmenities = data.elements.filter((amenity) => amenity.lat && amenity.lon);
         setAmenities(validAmenities);
       } else {
-        setErrorMsg('No valid data available');
+        setErrorMsg('لا توجد بيانات صالحة متاحة');
       }
     } catch (error) {
-      setErrorMsg('Failed to fetch data. Please try again.');
+      setErrorMsg('فشل في جلب البيانات. يرجى المحاولة مرة أخرى.');
     } finally {
       setLoading(false);
     }
@@ -166,7 +166,7 @@ const SearchBar = React.memo(({ searchQuery, handleSearch, clearSearch, selected
       />
       <TextInput
         style={styles.searchInput}
-        placeholder={`Search ${selectedAmenity}s...`}
+        placeholder={`...بحث`}
         placeholderTextColor={COLORS.textLight}
         value={searchQuery}
         onChangeText={handleSearch}

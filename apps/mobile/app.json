@@ -21,6 +21,7 @@
       },
       "infoPlist": {
         "NSHealthShareUsageDescription": "This app integrates with the Health app to track your health data.",
+        "NSMotionUsageDescription": "We need access to motion sensors to track your activity.",
         "NSHealthUpdateUsageDescription": "This app integrates with the Health app to update your health data.",
         "UIBackgroundModes": [
           "remote-notification"

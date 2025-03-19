@@ -3,17 +3,17 @@ import { View, FlatList, StyleSheet } from 'react-native';
 import { Text, List, Divider } from 'react-native-paper';
 
 const notifications = [
-  { id: '1', title: 'Appointment Reminder', description: 'You have an appointment with Dr. Smith at 10:00 AM tomorrow.' },
-  { id: '2', title: 'Lab Results Ready', description: 'Your lab results are ready for viewing.' },
-  { id: '3', title: 'Health Tip', description: 'Drink at least 8 glasses of water today for better hydration.' },
-  { id: '4', title: 'Insurance Update', description: 'Your insurance policy has been updated successfully.' },
+  { id: '1', title: 'تذكير بالموعد', description: 'لديك موعد مع الدكتور سميث الساعة 10:00 صباحًا غدًا.' },
+  { id: '2', title: 'نتائج الفحص جاهزة', description: 'نتائج فحصك جاهزة للمراجعة.' },
+  { id: '3', title: 'نصيحة صحية', description: 'اشرب على الأقل 8 أكواب من الماء اليوم لتحسين الترطيب.' },
+  { id: '4', title: 'تحديث التأمين', description: 'تم تحديث بوليصة التأمين الخاصة بك بنجاح.' },
 ];
 
 const NotificationScreen = () => {
   return (
     <View style={styles.container}>
       <Text variant="headlineMedium" style={styles.headerText}>
-        Notifications
+        الإشعارات
       </Text>
       <FlatList
         data={notifications}
@@ -46,3 +46,5 @@ const styles = StyleSheet.create({
 });
 
 export default NotificationScreen;
+
+

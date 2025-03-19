@@ -12,7 +12,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
-} from 'react-native';
+} from 'react-native'; 
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { Text } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import OpenAIService from '../../services/OpenAIService';
@@ -60,7 +61,7 @@ const ChatScreen = () => {
         }
       } catch (error) {
         console.error('Error loading messages:', error);
-        Alert.alert('Error', 'Failed to load chat history.');
+        Alert.alert( 'خطأ، فشل في تحميل تاريخ الدردشة.');
       } finally {
         setLoadingMessages(false);
       }
@@ -76,7 +77,7 @@ const ChatScreen = () => {
         await AsyncStorage.setItem(`chat_${userId}`, JSON.stringify(updatedMessages));
       } catch (error) {
         console.error('Error saving messages:', error);
-        Alert.alert('Error', 'Failed to save chat history.');
+        Alert.alert('خطأ، فشل في حفظ تاريخ الدردشة.');
       }
     },
     [userId]
@@ -84,12 +85,12 @@ const ChatScreen = () => {
 
   const handleDeleteMessages = () => {
     Alert.alert(
-      'Delete Chat',
-      'Are you sure you want to delete all chat data?',
+      'حذف الدردشة',
+      'هل أنت متأكد أنك تريد حذف جميع بيانات الدردشة؟',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'إلغاء', style: 'cancel' },
         {
-          text: 'Delete',
+          text: 'حذف',
           style: 'destructive',
           onPress: async () => {
             Animated.timing(fadeAnim, {
@@ -109,7 +110,7 @@ const ChatScreen = () => {
 
   const handleSendMessage = async () => {
     if (!inputText.trim()) {
-      Alert.alert('Error', 'Message cannot be empty!');
+      Alert.alert('لا يمكن أن تكون الرسالة فارغة!');
       return;
     }
 
@@ -154,7 +155,7 @@ const ChatScreen = () => {
       }
     } catch (error) {
       console.error('Error sending message:', error);
-      Alert.alert('Error', 'Failed to send message. Please try again.');
+      Alert.alert('خطأ، فشل في إرسال الرسالة. يرجى المحاولة مرة أخرى.');
     } finally {
       setIsLoading(false);
       Keyboard.dismiss();
@@ -209,7 +210,7 @@ const ChatScreen = () => {
     return (
       <View style={styles.loadingScreen}>
         <ActivityIndicator size="large" color={COLORS.blue} />
-        <Text style={styles.loadingText}>Loading chat...</Text>
+        <Text style={styles.loadingText}>جاري تحميل الدردشة...</Text>
       </View>
     );
   }
@@ -220,9 +221,9 @@ const ChatScreen = () => {
       style={styles.container}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
-      <View style={styles.header}>
+       <View style={styles.header}>
         <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteMessages}>
-          <Text style={styles.deleteButtonText}>Delete</Text>
+          <Text style={styles.deleteButtonText}>حذف</Text>
         </TouchableOpacity>
       </View>
 
@@ -238,7 +239,7 @@ const ChatScreen = () => {
         {isLoading && (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="small" color={COLORS.blue} />
-            <Text style={styles.loadingText}>AI is typing...</Text>
+            <Text style={styles.loadingText}>دكتور جي بي تي يكتب...</Text>
           </View>
         )}
       </ScrollView>
@@ -248,7 +249,7 @@ const ChatScreen = () => {
           style={styles.input}
           value={inputText}
           onChangeText={setInputText}
-          placeholder="Type a message..."
+          placeholder="اسأل دكتور الذكاء الاصطناعي ......"
           placeholderTextColor={COLORS.darkGray}
           multiline
         />
@@ -257,7 +258,8 @@ const ChatScreen = () => {
           onPress={!isLoading ? handleSendMessage : null}
           disabled={isLoading}
         >
-          <Text style={styles.sendButtonText}>Send</Text>
+          <Icon name="paper-plane" size={25} color={COLORS.primary} />
+          <Text style={styles.sendButtonText}>إرسال</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -274,8 +276,6 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 4,
-    borderBottomWidth: 1,
     borderBottomColor: COLORS.gray,
   },
   headerText: {
@@ -348,13 +348,13 @@ const styles = StyleSheet.create({
   sendButton: {
     backgroundColor: COLORS.black,
     borderRadius: 22.5,
-    paddingVertical: 10,
+    paddingVertical: 5,
     paddingHorizontal: 20,
     marginLeft: 10,
   },
   sendButtonText: {
     color: COLORS.white,
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: 'bold',
   },
   disabledButton: {
@@ -374,13 +374,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 15,
     top: 15,
-    padding: 5,
-    backgroundColor: COLORS.red,
+    padding: 15,
+    backgroundColor: COLORS.black,
     borderRadius: 5,
+    
   },
   deleteButtonText: {
-    color: COLORS.white,
+    color: COLORS.primary,
     fontWeight: 'bold',
+    fontSize: 15,
   },
 });
 

@@ -3,9 +3,9 @@ import { LineChart } from 'react-native-chart-kit';
 import { View, ScrollView, Text, TouchableOpacity, StyleSheet, TextInput, Animated, Dimensions, Modal, PanResponder } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
-import { Menu, Divider } from 'react-native-paper';
 import { auth, onAuthStateChanged } from '../constants/FireBaseConfig'; 
 import { fetchDocumentById } from "../constants/firebaseFunctions";
+
 
 // Define color constants for consistent styling
 const COLORS = {
@@ -13,6 +13,7 @@ const COLORS = {
   background: '#f3f4f6',
   white: '#FFFFFF',
   black: '#000',
+  red: '#FF6B6B',
   gray: '#E5E7EB',
 };
 
@@ -77,8 +78,8 @@ const HomeScreen = () => {
     const baseData = {
       weekly: {
         labels: ['الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت', 'الأحد'],
-        heartRate: [70, 72, 75, 78, 76, 74, 73],
-        bloodPressure: [118, 122, 125, 130, 128, 135, 132],
+        heartRate: [0, 70, 72, 75, 78, 76, 74, 73],
+        bloodPressure: [0, 118, 122, 125, 130, 128, 135, 132],
       },
       monthly: {
         labels: ['الأسبوع 1', 'الأسبوع 2', 'الأسبوع 3', 'الأسبوع 4'],
@@ -151,29 +152,15 @@ const HomeScreen = () => {
   ).current;
 
   // Scaling factor for heart rate to match blood pressure scale
-  const heartRateScalingFactor = 2; // Adjust this factor based on your data range
+  const heartRateScalingFactor = 1; // Adjust this factor based on your data range
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      {/* Header Section */}
       <View style={styles.header}>
-        <View style={styles.headerRow}>
-          <Icon.Button name="bell" size={25} style={styles.icon} onPress={() => navigation.navigate('NotificationScreen')} />
-          <TextInput style={styles.searchBar} placeholder="بحث..." value={searchQuery} onChangeText={handleSearchChange} />
-          <Icon.Button name="user" size={60} style={styles.icon} onPress={() => navigation.navigate('ProfileScreen')} />
-          <Menu
-            visible={menuVisible}
-            onDismiss={closeMenu}
-            anchor={<Icon.Button name="ellipsis-v" size={30} onPress={openMenu} style={styles.icon} />}
-            style={styles.menu}
-          >
-            <Menu.Item onPress={() => handleNavigation('SettingsScreen')} title="الإعدادات" icon="cog" titleStyle={styles.menuItemText} style={styles.menuItem} />
-            <Menu.Item onPress={() => handleNavigation('ProfileScreen')} title="الملف الشخصي" icon="user" titleStyle={styles.menuItemText} style={styles.menuItem} />
-            <Menu.Item onPress={() => handleNavigation('NearbyHospitalScreen')} title="المستشفى القريب" icon="hospital" titleStyle={styles.menuItemText} style={styles.menuItem} />
-            <Divider style={styles.menuDivider} />
-          </Menu>
-        </View>
-        <Text style={styles.headerText}>مرحبًا، {userName}!</Text> 
+         <View style={styles.headerRow}>
+         </View>
+    
+        <Text style={styles.headerText}>مرحبًا {userName}!</Text> 
         <Text style={styles.subtitle}>لنضع صحتك في المقام الأول اليوم.</Text>
       </View>
 
@@ -186,19 +173,8 @@ const HomeScreen = () => {
           </Animated.View>
         )}
 
-        {/* Legend for the chart */}
-        <View style={styles.legendContainer}>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendColorBox, { backgroundColor: '#D1FF66' }]} />
-            <Text style={styles.legendText}>معدل ضربات القلب</Text>
-          </View>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendColorBox, { backgroundColor: COLORS.black }]} />
-            <Text style={styles.legendText}>ضغط الدم</Text>
-          </View>
-        </View>
 
-        {/* Chart Section */}
+        {/* Enhanced Chart Section */}
         <View style={styles.graphContainer} {...panResponder.panHandlers}>
           <View style={styles.timeFilters}>
             {['weekly', 'monthly'].map((range, index) => (
@@ -206,173 +182,172 @@ const HomeScreen = () => {
                 key={index}
                 style={[
                   styles.filterButton,
-                  timeRange === range && styles.activeFilter,
+                  timeRange === range ? styles.activeFilter : styles.inactiveFilter,
                 ]}
                 onPress={() => setTimeRange(range)}
               >
-                <Text style={styles.filterText}>{index === 0 ? 'أسبوع' : 'شهر'}</Text>
+                <Text
+                  style={[
+                    styles.filterText,
+                    timeRange === range ? styles.activeFilterText : styles.inactiveText,
+                  ]}
+                >
+                  {index === 0 ? 'أسبوع' : 'شهر'}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
 
-          {/* Health Data Chart */}
+
+
+          {/* Enhanced Health Data Chart */}
           <LineChart
             data={{
               labels: generateChartData(timeRange).labels,
               datasets: [
                 {
                   data: generateChartData(timeRange).bloodPressure,
-                  color: (opacity = 1) => COLORS.black,
-                  strokeWidth: 2,
-                  label: 'ضغط الدم',
+                  color: (opacity = 1) => `rgba(255,107,107,${opacity})`, // Coral red
+                  strokeWidth: 3,
+                  withDots: true,
+                  withShadow: true,
+                  dashed: false,
                 },
                 {
-                  data: generateChartData(timeRange).heartRate.map(hr => hr * heartRateScalingFactor), // Scale heart rate
-                  color: (opacity = 1) => '#D1FF66',
-                  strokeWidth: 2,
-                  label: 'معدل ضربات القلب',
+                  data: generateChartData(timeRange).heartRate.map(hr => hr * heartRateScalingFactor),
+                  color: (opacity = 1) => `rgba(209,255,102,${opacity})`, // Neon lime
+                  strokeWidth: 3,
+                  withDots: true,
+                  withShadow: true,
+                  dashed: true, // Add dashed effect for differentiation
                 },
               ],
             }}
             width={Dimensions.get('window').width - 32}
-            height={220}
+            height={260}
             chartConfig={{
-              backgroundGradientFrom: COLORS.white,
-              backgroundGradientTo: COLORS.white,
+              backgroundGradientFrom: "#2A2F4F", // Dark navy
+              backgroundGradientTo: "#4A506B", // Medium navy
               decimalPlaces: 0,
-              color: (opacity = 1) => COLORS.black,
-              labelColor: (opacity = 1) => COLORS.black,
+              color: (opacity = 1) => `rgba(255,255,255,${opacity})`,
+              labelColor: (opacity = 1) => `rgba(255,255,255,${opacity})`,
               style: { borderRadius: 16 },
               propsForDots: {
-                r: '1',
-                strokeWidth: '2',
-                stroke: '#D1FF66',
+                r: "5",
+                strokeWidth: "2",
+                stroke: "#FFFFFF",
+                fill: "#FFFFFF",
               },
               propsForBackgroundLines: {
-                stroke: COLORS.gray,
-                strokeDasharray: '',
+                stroke: "rgba(255,255,255,0.2)",
+                strokeDasharray: "",
+              },
+              propsForLabels: {
+                fontWeight: "bold",
+                fontSize: 12
               },
               yAxisLabel: '',
               yAxisSuffix: '',
-              yAxisInterval: 1, // Optional, default is 1
+              yAxisInterval: 1,
+              fillShadowGradient: '#FFFFFF',
+              fillShadowGradientOpacity: 0.1,
             }}
             bezier
             style={styles.chart}
           />
+
+          
+      <View style={styles.legendContainer}>
+           <View style={styles.legendItem}>
+             <View style={[styles.legendColorBox, { backgroundColor: COLORS.primary }]} />
+             <Text style={styles.legendText}>معدل ضربات القلب</Text>
+           </View>
+           <View style={styles.legendItem}>
+             <View style={[styles.legendColorBox, { backgroundColor: COLORS.red }]} />
+             <Text style={styles.legendText}>ضغط الدم</Text>
+           </View>
+         </View>
+
         </View>
 
-        {/* Tooltip for the chart */}
+        {/* Enhanced Tooltip */}
         {tooltipVisible && (
-          <View style={[styles.tooltip, { left: tooltipData.x, top: tooltipData.y }]}>
-            <Text style={styles.tooltipText}>{tooltipData.value}</Text>
-            <TouchableOpacity onPress={() => setTooltipVisible(false)}>
-              <Text style={styles.closeTooltip}>X</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {/* AI Health Analysis Card */}
-        <View style={styles.aiCard}>
-          <Text style={styles.aiTitle}>تحليل الصحة بواسطة الذكاء الاصطناعي</Text>
-          <TouchableOpacity style={styles.aiButton} onPress={() => setModalVisible(true)}>
-            <Text style={styles.aiButtonText}>تحقق</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Health Metrics Section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>مقاييس الصحة</Text>
-            <Icon name="chevron-left" size={20} color={COLORS.black} />
-          </View>
-          <View style={styles.metricsGrid}>
-            {[
-              { title: 'ضغط الدم', subtitle: 'أحدث الاتجاهات', value: '+1.23%' },
-              { title: 'مستوى السكر في الدم', subtitle: 'مخاطر السكري', value: '-0.45%' },
-              { title: 'تغير معدل ضربات القلب', subtitle: 'مؤشر التوتر', value: '+0.76%' },
-              { title: 'مؤشر كتلة الجسم والوزن', subtitle: 'تتبع تغيرات الوزن', value: '+2.34%' },
-            ].map((metric, index) => (
-              <View key={index} style={styles.metricCard}>
-                <Text style={styles.metricTitle}>{metric.title}</Text>
-                <Text style={styles.metricSubtitle}>{metric.subtitle}</Text>
-                <Text style={styles.metricValue}>{metric.value}</Text>
+          <Animated.View style={[styles.tooltipContainer, { left: tooltipData.x - 100, top: tooltipData.y - 60 }]}>
+            <View style={styles.tooltipPointer}/>
+            <View style={styles.tooltipContent}>
+              <Text style={styles.tooltipText}>{tooltipData.value}</Text>
+              <View style={styles.tooltipLine}/>
+              <View style={styles.tooltipFooter}>
+                <Text style={styles.tooltipDate}>{new Date().toLocaleDateString('ar-EG')}</Text>
+                <TouchableOpacity onPress={() => setTooltipVisible(false)}>
+                  <Icon name="times-circle" size={18} color="#FFF" />
+                </TouchableOpacity>
               </View>
-            ))}
-          </View>
-        </View>
-
-        {/* Input Field for AI Interaction */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.inputField}
-            placeholder="اسأل دكتور الذكاء الاصطناعي ......"
-            placeholderTextColor={COLORS.gray}
-          />
-          <TouchableOpacity style={styles.sendButton}>
-            <Icon name="paper-plane" size={25} color={COLORS.primary} />
-          </TouchableOpacity>
-        </View>
+            </View>
+          </Animated.View>
+        )}
       </ScrollView>
 
       {/* Health Check Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
+      <View style={styles.container}>
         <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>تقييم الصحة</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="الوزن (كجم)"
-              value={weight}
-              onChangeText={setWeight}
-              keyboardType="numeric"
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="العمر (سنوات)"
-              value={age}
-              onChangeText={setAge}
-              keyboardType="numeric"
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="معدل ضربات القلب"
-              value={heartRate}
-              onChangeText={setHeartRate}
-              keyboardType="numeric"
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="ضغط الدم"
-              value={bloodPressure}
-              onChangeText={setBloodPressure}
-            />
+          <Text style={styles.modalTitle}>تقييم الصحة</Text>
+          <Text style={styles.aiTitle}>تحليل الصحة بواسطة الذكاء الاصطناعي</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="الوزن (كجم)"
+            value={weight}
+            onChangeText={setWeight}
+            keyboardType="numeric"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="العمر (سنوات)"
+            value={age}
+            onChangeText={setAge}
+            keyboardType="numeric"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="معدل ضربات القلب"
+            value={heartRate}
+            onChangeText={setHeartRate}
+            keyboardType="numeric"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="ضغط الدم"
+            value={bloodPressure}
+            onChangeText={setBloodPressure}
+          />
 
-            <TouchableOpacity style={styles.checkButton} onPress={handleCheckHealth}>
-              <Text style={styles.checkButtonText}>تحقق</Text>
-            </TouchableOpacity>
-            {riskResults && (
-              <View style={styles.resultsContainer}>
-                <Text style={styles.resultText}>مخاطر ارتفاع ضغط الدم: {riskResults.hypertensionRisk}%</Text>
-                <Text style={styles.resultText}>مخاطر السكري: {riskResults.diabetesRisk}%</Text>
-                <Text style={styles.resultText}>نصائح: {riskResults.tips}</Text>
-              </View>
-            )}
-            <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>إغلاق</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity style={styles.checkButton} onPress={handleCheckHealth}>
+            <Text style={styles.checkButtonText}>تحقق</Text>
+          </TouchableOpacity>
+
+          {riskResults && (
+            <View style={styles.resultsContainer}>
+              <Text style={styles.resultText}>مخاطر ارتفاع ضغط الدم: {riskResults.hypertensionRisk}%</Text>
+              <Text style={styles.resultText}>مخاطر السكري: {riskResults.diabetesRisk}%</Text>
+              <Text style={styles.resultText}>نصائح: {riskResults.tips}</Text>
+            </View>
+          )}
+
+
+
+          {/* the fuction here is still for closing when we had modal, we should chnage it to function for watch integration */}
+          <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
+            <Text style={styles.closeButtonText}>الحصول على البيانات من الساعة الذكية</Text>
+          </TouchableOpacity>
         </View>
-      </Modal>
+      </View>
+
+      {/* <PedometerTracker /> */}
     </ScrollView>
   );
 };
 
-// Styles
+
 const styles = StyleSheet.create({
   // Main container style
   container: {
@@ -382,10 +357,12 @@ const styles = StyleSheet.create({
   contentContainer: {
     paddingBottom: 30,
   },
+
+
   // Header styles
   header: {
     backgroundColor: COLORS.primary,
-    paddingVertical: 65,
+    paddingVertical: 40,
     paddingHorizontal: 20,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
@@ -395,30 +372,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  menu: {
-    backgroundColor: 'transparent',
-    borderRadius: 10,
-    elevation: 4,
-    marginTop: 10,
-  },
-  menuItem: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-  },
-  menuItemText: {
-    color: "#000",
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  menuDivider: {
-    backgroundColor: COLORS.gray,
-    marginVertical: 8,
-  },
+  
   headerText: {
     color: COLORS.black,
     fontWeight: 'bold',
     textAlign: 'right',
     fontSize: 32,
+    paddingTop: 50,
   },
   subtitle: {
     color: COLORS.black,
@@ -430,34 +390,45 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     color: COLORS.black,
   },
-  searchBar: {
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.white,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    marginTop: 5,
-    width: '50%',
-  },
+
+
+
   // Chart container styles
   graphContainer: {
-    backgroundColor: COLORS.white,
+    backgroundColor:'#2A2F4F',
     margin: 16,
-    borderRadius: 16,
-    elevation: 5,
+    borderRadius: 20,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    overflow: 'hidden',
   },
   timeFilters: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     padding: 8,
   },
-  legendContainer: {
+   legendContainer: {
+     flexDirection: 'row',
+     justifyContent: 'space-around',
+     padding: 10,
+     backgroundColor: "#2A2F4F",
+     borderBottomWidth: 1,
+     borderBottomColor: COLORS.gray,
+   },
+   legendColorBox: {
+    width: 20,
+    height: 20,
+    marginRight: 5,
+    borderRadius: 25,
+  },
+  legend: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    padding: 10,
-    backgroundColor: COLORS.white,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.gray,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 10,
+    padding: 8,
   },
   legendItem: {
     flexDirection: 'row',
@@ -467,15 +438,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.gray,
   },
-  legendColorBox: {
-    width: 20,
-    height: 20,
-    marginRight: 5,
-    borderRadius: 25,
+  legendDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginLeft: 5,
   },
   legendText: {
-    fontSize: 14,
-    color: COLORS.black,
+    color: COLORS.white,
+    fontSize: 12,
+    fontWeight: '600',
   },
   quoteCard: {
     backgroundColor: COLORS.transparent,
@@ -498,31 +470,105 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   filterButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    marginTop: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 15,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    marginHorizontal: 5,
   },
   filterText: {
+    color: '#FFF',
+    fontWeight: '600',
     fontSize: 14,
   },
   activeFilter: {
     backgroundColor: COLORS.primary,
     borderRadius: 8,
   },
-  chart: {
-    marginVertical: 8,
-    borderRadius: 16,
-    paddingRight: 10,
+  activeFilterText: {
+    color: COLORS.black,
   },
-  // Tooltip styles
-  tooltip: {
+
+  inactiveFilter: {
+    backgroundColor: '#4A506B', 
+  },
+  inactiveText: {
+    color: '#FFFFFF',
+  },
+
+
+
+  chart: {
+    marginVertical: 10,
+    paddingRight: 10,
+    paddingTop: 20,
+    marginBottom: 40,
+  },
+  chartHeader: {
     position: 'absolute',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    padding: 10,
-    borderRadius: 5,
+    top: 20,
+    right: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  chartTitle: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginRight: 15,
+  },
+
+  
+  // Tooltip styles
+  tooltipContainer: {
+    position: 'absolute',
+    backgroundColor: 'rgba(42,47,79,0.95)',
+    borderRadius: 10,
+    padding: 12,
+    width: 200,
     zIndex: 1000,
+    elevation: 10,
+  },
+  tooltipPointer: {
+    position: 'absolute',
+    top: -10,
+    left: '50%',
+    width: 0,
+    height: 0,
+    backgroundColor: 'transparent',
+    borderStyle: 'solid',
+    borderLeftWidth: 10,
+    borderRightWidth: 10,
+    borderBottomWidth: 10,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: 'rgba(42,47,79,0.95)',
+    transform: [{ translateX: -10 }],
+  },
+  tooltipContent: {
+    position: 'relative',
+    zIndex: 1001,
   },
   tooltipText: {
-    color: 'white',
+    color: '#FFF',
+    fontSize: 14,
+    lineHeight: 20,
+    textAlign: 'center',
+  },
+  tooltipLine: {
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    marginVertical: 8,
+  },
+  tooltipFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  tooltipDate: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 12,
   },
   closeTooltip: {
     color: 'red',
@@ -559,84 +605,22 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  // Health Metrics Section styles
-  section: {
-    marginHorizontal: 16,
-    marginBottom: 16,
-    padding: 16,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'right',
-    color: COLORS.black,
-  },
-  metricsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  metricCard: {
-    backgroundColor: COLORS.gray,
-    padding: 16,
-    borderRadius: 12,
-    width: '48%',
-    marginBottom: 16,
-    height: 120,
-    elevation: 3,
-    borderBlockColor: COLORS.black,
-    borderBlockWidth: 1,
-  },
-  metricTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    textAlign: 'right',
-  },
-  metricSubtitle: {
-    fontSize: 12,
-    textAlign: 'right',
-  },
-  metricValue: {
-    fontSize: 16,
-    color: COLORS.black,
-    marginTop: 4,
-    textAlign: 'right',
-  },
-  // Input Field styles
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: COLORS.gray,
-    borderRadius: 25,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    margin: 16,
-    backgroundColor: COLORS.white,
-  },
-  inputField: {
-    flex: 1,
-    fontSize: 16,
-    color: COLORS.black,
-  },
-  sendButton: {
-    marginLeft: 10,
-  },
+  
+
+
   // Modal styles
   modalContainer: {
     flex: 1,
+    width: '94%',
+    borderRadius: 22,
+    alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: COLORS.white,
+    marginTop: 40,
   },
   modalContent: {
-    width: '100%',
+    width: '90%',
     backgroundColor: COLORS.white,
     borderRadius: 10,
     padding: 20,
@@ -648,9 +632,11 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
+    marginTop: 10,
     marginBottom: 15,
     textAlign: 'center',
-  },
+    paddingBottom: 20,
+    },
   input: {
     height: 40,
     borderColor: COLORS.gray,
@@ -659,14 +645,14 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 10,
-    width: '100%',
+    width: '85%',
   },
   checkButton: {
     backgroundColor: COLORS.primary,
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
-    width: '100%',
+    width: '85%',
   },
   checkButtonText: {
     color: COLORS.black,
@@ -683,7 +669,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   closeButton: {
-    width: '100%',
+    width: '85%',
     textAlign: 'center',
     color: COLORS.black,
     marginTop: 15,
@@ -702,5 +688,4 @@ const styles = StyleSheet.create({
   },
 });
 
-// Export the main screen component
 export default HomeScreen;

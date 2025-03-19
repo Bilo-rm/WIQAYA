@@ -1,9 +1,33 @@
-import React, {useEffect} from "react"
+import {  onAuthStateChanged } from "firebase/auth";
+import React, {useEffect, useState} from "react"
 import { StyleSheet, Image, Text, View, ImageBackground, Animated } from "react-native"
+import {auth} from '../../src/constants/FireBaseConfig';
 
 const WelcomeScreen = ({navigation}) => {
 
   const fadeAnim = new Animated.Value(0);
+
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true); 
+
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        setUserData(firebaseUser);
+      } else {
+        setUserData(null);
+      }
+      setLoading(false);
+  });
+  return () => unsubscribe();
+  }, []);
+
+  // if (loading) {
+  //   return null;
+  // }
+
+
 
    useEffect(() => {
      Animated.timing(fadeAnim, {
@@ -14,7 +38,7 @@ const WelcomeScreen = ({navigation}) => {
 
       //Navigate to HomeScreen after animation ends
      const timer = setTimeout(() => {
-       navigation.replace('AuthScreen');  //Use replace to prevent going back to WelcomeScreen
+       navigation.replace(userData ? 'HomeScreen' : 'AuthScreen');  //Use replace to prevent going back to WelcomeScreen
      }, 2000);  //Match duration of animation
 
      return () => clearTimeout(timer);  //Cleanup timer on unmount
@@ -29,9 +53,10 @@ const WelcomeScreen = ({navigation}) => {
         />
         
       </View>
-      <Text style={styles.AppName}>Mobile Health Care App...◌</Text>
+      <Text style={styles.AppName}>             </Text>
+      <Text style={styles.AppName}>وقاية...◌</Text>
         <Text style={styles.BottomText}>
-          A Health Advice Application
+        تطبيق المشورة الصحية
         </Text>
     </View>
   )

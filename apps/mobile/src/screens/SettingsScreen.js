@@ -27,11 +27,11 @@ const SettingsScreen = ({ navigation }) => {
 
   const handleLogout = async () => {
     Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
+      'تسجيل الخروج',
+      'هل أنت متأكد أنك تريد تسجيل الخروج؟',
       [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Logout', onPress: confirmLogout, style: 'destructive' },
+        { text: 'إلغاء', style: 'cancel' },
+        { text: 'تسجيل الخروج', onPress: confirmLogout, style: 'destructive' },
       ],
       { cancelable: true }
     );
@@ -40,10 +40,10 @@ const SettingsScreen = ({ navigation }) => {
   const confirmLogout = async () => {
     try {
       await signOut(auth);
-      Alert.alert('Logged Out', 'You have successfully logged out.');
+      Alert.alert('تم تسجيل الخروج', 'تم تسجيل الخروج بنجاح.');
       navigation.navigate('LoginScreen');
     } catch (error) {
-      Alert.alert('Error', 'Failed to log out. Please try again.');
+      Alert.alert('خطأ', 'فشل في تسجيل الخروج. يرجى المحاولة مرة أخرى.');
       console.error('Logout Error:', error);
     }
   };
@@ -72,18 +72,18 @@ const SettingsScreen = ({ navigation }) => {
 
   const handleChangePassword = async () => {
     Alert.prompt(
-      'Change Password',
-      'Enter your new password:',
+      'تغيير كلمة المرور',
+      'أدخل كلمة مرورك الجديدة:',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'إلغاء', style: 'cancel' },
         {
-          text: 'Save',
+          text: 'حفظ',
           onPress: async (newPassword) => {
             try {
               await updatePassword(auth.currentUser, newPassword);
-              Alert.alert('Success', 'Password updated successfully.');
+              Alert.alert('نجاح', 'تم تحديث كلمة المرور بنجاح.');
             } catch (error) {
-              Alert.alert('Error', 'Failed to update password. Please try again.');
+              Alert.alert('خطأ', 'فشل في تحديث كلمة المرور. يرجى المحاولة مرة أخرى.');
               console.error('Password Update Error:', error);
             }
           },
@@ -95,18 +95,18 @@ const SettingsScreen = ({ navigation }) => {
 
   const handleUpdateEmail = async () => {
     Alert.prompt(
-      'Update Email',
-      'Enter your new email:',
+      'تحديث البريد الإلكتروني',
+      'أدخل بريدك الإلكتروني الجديد:',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'إلغاء', style: 'cancel' },
         {
-          text: 'Save',
+          text: 'حفظ',
           onPress: async (newEmail) => {
             try {
               await updateEmail(auth.currentUser, newEmail);
-              Alert.alert('Success', 'Email updated successfully.');
+              Alert.alert('نجاح', 'تم تحديث البريد الإلكتروني بنجاح.');
             } catch (error) {
-              Alert.alert('Error', 'Failed to update email. Please try again.');
+              Alert.alert('خطأ', 'فشل في تحديث البريد الإلكتروني. يرجى المحاولة مرة أخرى.');
               console.error('Email Update Error:', error);
             }
           },
@@ -118,11 +118,11 @@ const SettingsScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Settings</Text>
+      <Text style={styles.header}></Text>
 
       <List.Section style={styles.section}>
         <List.Item
-          title="Enable Notifications"
+          title="تمكين الإشعارات"
           right={() => (
             <Switch
               value={isNotificationsEnabled}
@@ -131,7 +131,7 @@ const SettingsScreen = ({ navigation }) => {
           )}
         />
         <List.Item
-          title="Dark Mode"
+          title="الوضع المظلم"
           right={() => (
             <Switch
               value={isDarkModeEnabled}
@@ -143,22 +143,22 @@ const SettingsScreen = ({ navigation }) => {
 
       <List.Section style={styles.section}>
         <List.Item
-          title="Change Password"
+          title="تغيير كلمة المرور"
           onPress={handleChangePassword}
         />
         <List.Item
-          title="Update Email"
+          title="تحديث البريد الإلكتروني"
           onPress={handleUpdateEmail}
         />
         <List.Item
-          title="Privacy Settings"
+          title="إعدادات الخصوصية"
           onPress={() => navigation.navigate('PrivacySettingsScreen')}
         />
       </List.Section>
 
       <List.Section style={styles.section}>
         <List.Item
-          title="Logout"
+          title="تسجيل الخروج"
           onPress={handleLogout}
           style={styles.logoutItem}
           titleStyle={styles.logoutText}
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 24,
-    color: '#2260FF',
+    color: '#000',
     fontWeight: 'bold',
     marginBottom: 20,
   },
@@ -185,12 +185,12 @@ const styles = StyleSheet.create({
   },
   logoutItem: {
     marginTop: 20,
-    backgroundColor: '#FF5733',
+    backgroundColor: '#D1FF66',
     borderRadius: 10,
     paddingVertical: 10,
   },
   logoutText: {
-    color: '#FFF',
+    color: '#000',
     textAlign: 'center',
     fontWeight: 'bold',
   },

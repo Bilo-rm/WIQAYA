@@ -5,21 +5,24 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { Provider as PaperProvider, Menu, IconButton, Divider } from 'react-native-paper';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesome } from '@expo/vector-icons';
+
+
 // Screens
 import WelcomeScreen from './src/screens/WelcomeScreen';
 import AuthScreen from './src/screens/Auth/AuthScreen';
 import LoginScreen from './src/screens/Auth/LoginScreen';
 import ForgotPassword from './src/screens/Auth/ForgotPassword';
 import CreateAccount from './src/screens/Auth/CreateAccount';
+
+
+
 import HomeScreen from './src/screens/HomeScreen';
 import NearbyHospitalScreen from './src/screens/NearbyHospitalScreen';
 import ProfileScreen from './src/screens/Profile/ProfileScreen';
-import UserInformationScreen from './src/screens/Profile/UserInformation';
-import MedicalHistoryScreen from './src/screens/Profile/MedicalHistoryScreen';
-import LifestyleScreen from './src/screens/Profile/LifestyleScreen';
 import ChatScreen from './src/screens/Chat/ChatScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import NotificationScreen from './src/screens/NotificationScreen';
+
 
 
 
@@ -59,24 +62,22 @@ const App = () => {
   return (
     <PaperProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName={userData ? 'HomeScreen' : 'WelcomeScreen'}>
+        <Stack.Navigator initialRouteName={'WelcomeScreen'}>
           {/* Authentication Flow */}
           <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} options={{ headerShown: false }} />
           <Stack.Screen name="AuthScreen" component={AuthScreen} options={{ headerShown: false }} />
           <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ title: 'Login' }} />
           <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ title: 'Reset Password' }} />
           <Stack.Screen name="CreateAccount" component={CreateAccount} options={{ title: 'Create Account' }} />
-          <Stack.Screen name="MedicalHistoryScreen" component={MedicalHistoryScreen} options={{ title: 'Medical History' }} />
 
           {/* Main App Screens */}
           <Stack.Screen name="HomeScreen" component={Tabs} options={{ headerShown: false }} />
-          <Stack.Screen name="DR.GPT" component={ChatScreen} options={{ title: 'DR. GPT' }} />
-          <Stack.Screen name="NearbyHospitalScreen" component={NearbyHospitalScreen} options={{ title: 'NearbyHospital' }} />
-          <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ title: 'Profile' }} />
-          <Stack.Screen name="UserInformationScreen" component={UserInformationScreen} options={{ title: 'User Information' }} />
-          <Stack.Screen name="LifestyleScreen" component={LifestyleScreen} options={{ title: 'Lifestyle' }} />
-          <Stack.Screen name="SettingsScreen" component={SettingsScreen} options={{ title: 'Settings' }} />
-          <Stack.Screen name="NotificationScreen" component={NotificationScreen} options={{ title: 'Notifications' }} />
+          <Stack.Screen name="DR.GPT" component={ChatScreen} options={{ title: "الدكتور جي بي تي" }} />
+          <Stack.Screen name="NearbyHospitalScreen" component={NearbyHospitalScreen} options={{ title: "المستشفى القريب" , headerStyle: {backgroundColor: '#D1FF66', },headerTintColor: '#000000',}} />
+          <Stack.Screen name="SettingsScreen" component={SettingsScreen} options={{ title: 'الإعدادات' , headerStyle: {backgroundColor: '#D1FF66', },headerTintColor: '#000000',}} />
+          <Stack.Screen name="NotificationScreen" component={NotificationScreen} options={{ title: 'إشعار' , headerStyle: {backgroundColor: '#D1FF66', },headerTintColor: '#000000', }} />
+          <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ title: "الملف الشخصي" , headerStyle: {backgroundColor: '#D1FF66', },headerTintColor: '#000000',}} />
+          
 
          </Stack.Navigator>
       </NavigationContainer>
@@ -108,7 +109,7 @@ const Tabs = ({ navigation }) => {
     >
       {/* Tab for Home */}
       <Tab.Screen
-        name="Home"
+        name="الشاشة الرئيسية"
         component={HomeScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
@@ -120,7 +121,7 @@ const Tabs = ({ navigation }) => {
       
       {/* Tab for DR.GPT */}
       <Tab.Screen
-        name="DR. GPT"
+        name="الدكتور جي بي تي"
         component={ChatScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
@@ -133,11 +134,10 @@ const Tabs = ({ navigation }) => {
               anchor={<IconButton icon="dots-vertical" size={30} onPress={openMenu} />}
               style={{ color: '#FFF', position: 'absolute', top: 100, right: 15, left: 125 }}
             >
-              <Menu.Item onPress={() => handleNavigation('SettingsScreen')} title="Settings" />
-              <Menu.Item onPress={() => handleNavigation('ProfileScreen')} title="Profile" />
-              <Menu.Item onPress={() => handleNavigation('NotificationScreen')} title="Notifications" />
-              <Menu.Item onPress={() => handleNavigation('NearbyHospitalScreen')} title="NearbyHospital" />
-              <Divider />
+              <Menu.Item onPress={() => handleNavigation('SettingsScreen')} title="الإعدادات" />
+              <Menu.Item onPress={() => handleNavigation('ProfileScreen')} title="الملف الشخصي" />
+              <Menu.Item onPress={() => handleNavigation('NotificationScreen')} title="إشعار" />
+              <Menu.Item onPress={() => handleNavigation('NearbyHospitalScreen')} title="المستشفى القريب" />
             </Menu>
           ),
         }}
@@ -147,7 +147,7 @@ const Tabs = ({ navigation }) => {
 
       {/* Tab for Nearby Hospitals and Doctors */}
       <Tab.Screen
-        name="Nearby Hospitals"
+        name="المستشفى القريب"
         component={NearbyHospitalScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
@@ -160,11 +160,10 @@ const Tabs = ({ navigation }) => {
               anchor={<IconButton icon="dots-vertical" size={30} onPress={openMenu} />}
               style={{ color: '#FFF', position: 'absolute', top: 100, right: 15, left: 125 }}
             >
-              <Menu.Item onPress={() => handleNavigation('SettingsScreen')} title="Settings" />
-              <Menu.Item onPress={() => handleNavigation('ProfileScreen')} title="Profile" />
-              <Menu.Item onPress={() => handleNavigation('NearbyHospitalScreen')} title="NearbyHospital" />
-              <Menu.Item onPress={() => handleNavigation('NotificationScreen')} title="Notifications" />
-              <Divider />
+              <Menu.Item onPress={() => handleNavigation('SettingsScreen')} title="الإعدادات" />
+              <Menu.Item onPress={() => handleNavigation('ProfileScreen')} title="الملف الشخصي" />
+              <Menu.Item onPress={() => handleNavigation('NearbyHospitalScreen')} title="المستشفى القريب" />
+              <Menu.Item onPress={() => handleNavigation('NotificationScreen')} title='إشعار' />
             </Menu>
           ),
         }}
