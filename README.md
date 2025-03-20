@@ -18,12 +18,27 @@
    ```bash
    git clone https://github.com/Bilo-rm/WIQAYA.git
    ```
+ ## FOR the back end
 
 2. **Navigate to the Project Directory**
    ```bash
    cd WIQAYA
    ```
 
+3. **Install Dependencies**
+   ```bash
+   npm istall
+   npm i nodemon
+   nodemon server.js
+   ```
+ ## FOR the Front end
+
+2. **Navigate to the Project Directory**
+   ```bash
+   cd WIQAYA
+   cd apps
+   cd mobile
+   ```
 3. **Install Dependencies**
    Since the project may have some dependency compatibility issues, use the following command:
    ```bash
@@ -34,6 +49,7 @@
    ```bash
    npm start
    ```
+   use expo (S)
 
 ---
 
