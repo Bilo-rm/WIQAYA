@@ -119,7 +119,7 @@ const HomeScreen = () => {
       console.log('Sending health data:', healthData);
   
       // Make a POST request to the /predict endpoint
-      const response = await axios.post('http://172.20.14.38:5000/predict', healthData);
+      const response = await axios.post('http://192.168.10.157:5000/predict', healthData);
   
       console.log('Health check response:', response.data);
   
@@ -157,7 +157,7 @@ const HomeScreen = () => {
           setTooltipData({
             x: locationX,
             y: locationY,
-            value: `معدل ضربات القلب: ${value.heartRate}, ضغط الدم: ${value.bloodPressure}`,
+            value: `السكري  : ${value.heartRate}, ضغط الدم: ${value.bloodPressure}`,
           });
           setTooltipVisible(true);
         }
@@ -295,7 +295,7 @@ const HomeScreen = () => {
       <View style={styles.legendContainer}>
            <View style={styles.legendItem}>
              <View style={[styles.legendColorBox, { backgroundColor: COLORS.primary }]} />
-             <Text style={styles.legendText}>معدل ضربات القلب</Text>
+             <Text style={styles.legendText}>  السكري</Text>
            </View>
            <View style={styles.legendItem}>
              <View style={[styles.legendColorBox, { backgroundColor: COLORS.red }]} />

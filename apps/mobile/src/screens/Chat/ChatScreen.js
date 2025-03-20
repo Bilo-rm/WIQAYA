@@ -126,7 +126,7 @@ const ChatScreen = () => {
     setIsLoading(true);
   
     try {
-      const response = await fetch('http://172.20.14.38:5000/chat', {
+      const response = await fetch('http://192.168.10.157:5000/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
