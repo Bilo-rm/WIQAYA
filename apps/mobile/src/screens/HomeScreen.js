@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect ,useRef } from 'react';
 import { LineChart } from 'react-native-chart-kit';
 import { View, ScrollView, Text, TouchableOpacity, StyleSheet, TextInput, Animated, Dimensions, Modal, PanResponder } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 import { auth, onAuthStateChanged } from '../constants/FireBaseConfig'; 
 import { fetchDocumentById } from "../constants/firebaseFunctions";
-
+import axios from 'axios';
 
 // Define color constants for consistent styling
 const COLORS = {
@@ -40,6 +40,8 @@ const HomeScreen = () => {
 
   const userId = auth.currentUser  ? auth.currentUser .uid : null;
 
+
+  
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser ) => {
       console.log("Auth state changed, user:", firebaseUser );
@@ -104,18 +106,37 @@ const HomeScreen = () => {
     closeMenu();
   };
 
-  const handleCheckHealth = () => {
-    const hypertensionRisk = (parseInt(weight) + parseInt(age)) % 100;
-    const diabetesRisk = (parseInt(weight) + parseInt(age)) % 50;
-
-    setRiskResults({
-      hypertensionRisk,
-      diabetesRisk,
-      tips: "زيادة النشاط البدني وتناول الطعام الصحي.",
-    });
-    console.log(hypertensionRisk, diabetesRisk);  
+  const handleCheckHealth = async () => {
+    try {
+      // Prepare the data to be sent to the API
+      const healthData = {
+        age: parseInt(age),
+        weight: parseInt(weight),
+        bp: bloodPressure,
+        heartRate: parseInt(heartRate),
+      };
+  
+      console.log('Sending health data:', healthData);
+  
+      // Make a POST request to the /predict endpoint
+      const response = await axios.post('http://172.20.14.38:5000/predict', healthData);
+  
+      console.log('Health check response:', response.data);
+  
+      // Extract the response data
+      const { diabetes_risk, hypertension_risk, advice } = response.data;
+  
+      // Update the state with the results
+      setRiskResults({
+        diabetesRisk: diabetes_risk,
+        hypertensionRisk: hypertension_risk,
+        tips: advice,
+      });
+    } catch (error) {
+      console.error('Error during health check:', error.response?.data || error.message);
+      setErrorMessage('Failed to check health. Please try again.');
+    }
   };
-
   // PanResponder for touch events
   const panResponder = React.useRef(
     PanResponder.create({
@@ -154,6 +175,20 @@ const HomeScreen = () => {
   // Scaling factor for heart rate to match blood pressure scale
   const heartRateScalingFactor = 1; // Adjust this factor based on your data range
 
+  const riskResultsAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (riskResults) {
+      Animated.timing(riskResultsAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      riskResultsAnim.setValue(0);
+    }
+  }, [riskResults]);
+  
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <View style={styles.header}>
@@ -169,7 +204,7 @@ const HomeScreen = () => {
         {/* Animated Quote Section */}
         {quoteVisible && (
           <Animated.View style={[styles.quoteCard, { opacity: fadeAnim }]}>
-            <Text style={styles.quoteText}>"أعظم ثروة هي الصحة."</Text>
+            <Text style={styles.quoteText}> مؤشر خطر الأصابة :</Text>
           </Animated.View>
         )}
 
@@ -326,11 +361,23 @@ const HomeScreen = () => {
           </TouchableOpacity>
 
           {riskResults && (
-            <View style={styles.resultsContainer}>
-              <Text style={styles.resultText}>مخاطر ارتفاع ضغط الدم: {riskResults.hypertensionRisk}%</Text>
-              <Text style={styles.resultText}>مخاطر السكري: {riskResults.diabetesRisk}%</Text>
-              <Text style={styles.resultText}>نصائح: {riskResults.tips}</Text>
-            </View>
+            <Animated.View style={[styles.resultsContainer, { opacity: riskResultsAnim }]}>
+              <View style={styles.resultCard}>
+                <Text style={styles.resultTitle}>نتائج التحليل</Text>
+                <View style={styles.resultItem}>
+                  <Text style={styles.resultLabel}>مخاطر ارتفاع ضغط الدم:</Text>
+                  <Text style={styles.resultValue}>{riskResults.hypertensionRisk}</Text>
+                </View>
+                <View style={styles.resultItem}>
+                  <Text style={styles.resultLabel}>مخاطر السكري:</Text>
+                  <Text style={styles.resultValue}>{riskResults.diabetesRisk}</Text>
+                </View>
+                <View style={styles.resultItem}>
+                  <Text style={styles.resultLabel}>نصائح:</Text>
+                  <Text style={styles.resultTips}>{riskResults.tips}</Text>
+                </View>
+              </View>
+            </Animated.View>
           )}
 
 
@@ -660,14 +707,66 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   resultsContainer: {
-    marginTop: 15,
+    marginTop: 20,
     alignItems: 'center',
     width: '100%',
   },
-  resultText: {
-    textAlign: 'center',
-    marginVertical: 5,
+  resultCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    padding: 10,
+    width: '90%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
   },
+  resultTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#2A2F4F',
+    textAlign: 'center',
+    marginBottom: 15,
+    writingDirection: 'rtl', // Right-to-left text direction
+  },
+  resultItem: {
+    flexDirection: 'row-reverse', // Reverse the row direction for Arabic layout
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  resultLabel: {
+    fontSize: 16,
+    color: '#4A506B',
+    fontWeight: '600',
+    textAlign: 'right', // Align Arabic text properly
+    writingDirection: 'rtl',
+    flex: 1, // Allow text to wrap inside container
+  },
+  resultValue: {
+    fontSize: 16,
+    color: '#FF6B6B',
+    fontWeight: 'bold',
+    textAlign: 'left',
+    writingDirection: 'rtl',
+    flexShrink: 1, // Prevents overflowing
+  },
+  resultTips: {
+    fontSize: 14,
+    color: '#4A506B',
+    lineHeight: 22,
+    textAlign: 'right',
+    marginTop: 10,
+    writingDirection: 'rtl',
+    flexWrap: 'wrap', // Ensure text wraps inside the container
+    overflow: 'hidden', // Prevent text from overflowing
+  },
+
+
   closeButton: {
     width: '85%',
     textAlign: 'center',

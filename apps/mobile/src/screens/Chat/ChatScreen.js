@@ -113,14 +113,49 @@ const ChatScreen = () => {
       Alert.alert('لا يمكن أن تكون الرسالة فارغة!');
       return;
     }
-
+  
     const userMessage = {
       id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      sender: 'User ',
+      sender: 'User',
       text: inputText,
       timestamp: new Date().toISOString(),
     };
-
+  
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    setInputText('');
+    setIsLoading(true);
+  
+    try {
+      const response = await fetch('http://172.20.14.38:5000/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: inputText }),
+      });
+  
+      const data = await response.json();
+  
+      if (data.response) {
+        const aiMessage = {
+          id: `${Date.now()}_AI_${Math.random().toString(36).substr(2, 9)}`,
+          sender: 'AI',
+          text: data.response,
+          timestamp: new Date().toISOString(),
+        };
+  
+        setMessages((prevMessages) => [...prevMessages, aiMessage]);
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      Alert.alert('خطأ، فشل في إرسال الرسالة. يرجى المحاولة مرة أخرى.');
+    } finally {
+      setIsLoading(false);
+      Keyboard.dismiss();
+    }
+  };
+  
+/*
     const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
     setInputText('');
@@ -160,7 +195,7 @@ const ChatScreen = () => {
       setIsLoading(false);
       Keyboard.dismiss();
     }
-  };
+  };*/
 
   const renderMessage = (msg) => (
     <View
